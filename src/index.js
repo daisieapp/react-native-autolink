@@ -72,18 +72,19 @@ export default class Autolink extends Component {
       case 'email': {
         return [`mailto:${encodeURIComponent(match.getEmail())}`];
       }
-      case 'hashtag': {
-        const tag = encodeURIComponent(match.getHashtag());
+      // TODO: if we decide to support hashtags, re-implement this
+      // case 'hashtag': {
+      //   const tag = encodeURIComponent(match.getHashtag());
 
-        switch (this.props.hashtag) {
-          case 'instagram':
-            return [`instagram://tag?name=${tag}`, `https://www.instagram.com/explore/tags/${tag}/`];
-          case 'twitter':
-            return [`twitter://search?query=%23${tag}`, `https://twitter.com/hashtag/${tag}`];
-          default:
-            return [match.getMatchedText()];
-        }
-      }
+      //   switch (this.props.hashtag) {
+      //     case 'instagram':
+      //       return [`instagram://tag?name=${tag}`, `https://www.instagram.com/explore/tags/${tag}/`];
+      //     case 'twitter':
+      //       return [`twitter://search?query=%23${tag}`, `https://twitter.com/hashtag/${tag}`];
+      //     default:
+      //       return [match.getMatchedText()];
+      //   }
+      // }
       case 'latlng': {
         const latlng = match.getLatLng();
         const query = latlng.replace(/\s/g, '');
@@ -92,15 +93,8 @@ export default class Autolink extends Component {
       }
       case 'mention': {
         const mention = match.getMention();
-
-        switch (this.props.mention) {
-          case 'instagram':
-            return [`instagram://user?username=${mention}`, `https://www.instagram.com/${mention}/`];
-          case 'twitter':
-            return [`twitter://user?screen_name=${mention}`, `https://twitter.com/${mention}`];
-          default:
-            return [match.getMatchedText()];
-        }
+        // TODO: Once daisie URIs have been set up, make sure this still works
+        return [`daisie://user?username=${mention}`, `https://www.daisie.com/${mention}`]
       }
       case 'phone': {
         const number = match.getNumber();
@@ -160,16 +154,15 @@ export default class Autolink extends Component {
       text,
       truncate,
       truncateChars,
-      twitter,
       url,
       webFallback,
       ...other
     } = this.props;
 
     // Backwards compatibility for Twitter prop
-    if (!mention && twitter) {
-      mention = 'twitter';
-    }
+    // if (!mention && twitter) {
+    //   mention = 'twitter';
+    // }
 
     // Creates a token with a random UID that should not be guessable or
     // conflict with other parts of the string.
@@ -265,17 +258,16 @@ Autolink.defaultProps = {
   stripPrefix: true,
   truncate: 32,
   truncateChars: '..',
-  twitter: false,
   url: true,
   webFallback: Platform.OS !== 'ios', // iOS requires LSApplicationQueriesSchemes for Linking.canOpenURL
 };
 
 Autolink.propTypes = {
   email: PropTypes.bool,
-  hashtag: PropTypes.oneOf([false, 'instagram', 'twitter']),
+  // hashtag: PropTypes.oneOf([false, 'instagram', 'twitter']),
   latlng: PropTypes.bool,
   linkStyle: Text.propTypes.style, // eslint-disable-line react/no-typos
-  mention: PropTypes.oneOf([false, 'instagram', 'twitter']),
+  mention: PropTypes.bool,
   numberOfLines: PropTypes.number,
   onPress: PropTypes.func,
   onLongPress: PropTypes.func,
@@ -287,7 +279,6 @@ Autolink.propTypes = {
   text: PropTypes.string.isRequired,
   truncate: PropTypes.number,
   truncateChars: PropTypes.string,
-  twitter: PropTypes.bool,
   url: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.shape({
